@@ -1,15 +1,22 @@
-var express = require('express');
-const { pool } = require('../config');
-var router = express.Router();
+const sql = require('sql-template-strings');
+const Router = require('express-promise-router');
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  pool.query('SELECT * FROM books', (error, results) => {
-    if (error) {
-      throw error
-    }
-    res.status(200).json(results.rows)
-  })
+const db = require('../db');
+
+const router = new Router();
+
+router.get('/', async (req, res) => {
+  const { rows } = await db.query('SELECT * FROM uzytkownik');
+  res.status(200).send(rows);
+});
+
+router.post('/', async (req, res) => {
+  let { email, password } = req.body;
+
+  await db.query(sql`
+    INSERT INTO uzytkownik (email, haslo) 
+    VALUES (${email}, ${password})`);
+  res.status(200).send();
 });
 
 module.exports = router;
