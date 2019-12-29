@@ -15,6 +15,11 @@ router.post('/', async (req, res) => {
 
   if (!email && !password) return res.status(400).send('Niepoprawne dane.');
 
+  const { rows } = await db.query(sql`
+    SELECT email FROM uzytkownik WHERE email=${email}
+  `);
+  if (rows) return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
+
   try {
     if (!firstName && !lastName && !phone) {
       await db.query(sql`
@@ -27,7 +32,7 @@ router.post('/', async (req, res) => {
     }
   } catch (err) {
     if (err.code === 23505)
-      return res.status(409).send('Konto z podanym adresem e-mail już istnieje.')
+      return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
   }
 
   res.status(200).send();
