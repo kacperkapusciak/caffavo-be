@@ -18,7 +18,8 @@ router.post('/', async (req, res) => {
   const { rows } = await db.query(sql`
     SELECT email FROM uzytkownik WHERE email=${email}
   `);
-  if (rows) return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
+
+  if (rows.length) return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
 
   try {
     if (!firstName && !lastName && !phone) {
