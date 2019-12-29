@@ -11,11 +11,20 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  let { email, password } = req.body;
+  const { email, password, firstName, lastName, phone } = req.body;
 
-  await db.query(sql`
-    INSERT INTO uzytkownik (email, haslo) 
-    VALUES (${email}, ${password})`);
+  if (!email && !password) return res.status(400).send();
+
+  if (!firstName && !lastName && !phone) {
+    await db.query(sql`
+      INSERT INTO uzytkownik (email, haslo) 
+      VALUES (${email}, ${password})`);
+  } else {
+    await db.query(sql`
+      INSERT INTO uzytkownik (email, haslo, imie, nazwisko, telefon) 
+      VALUES (${email}, ${password}, ${firstName}, ${lastName}, ${phone})`);
+  }
+
   res.status(200).send();
 });
 
