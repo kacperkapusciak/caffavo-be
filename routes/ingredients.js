@@ -7,7 +7,18 @@ const router = new Router();
 
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`SELECT * FROM skladniki`);
-  res.status(200).send(rows);
+
+  const mappedRows = rows.map(row => {
+    return {
+    id: row.id,
+    name: row.nazwa,
+    amount: row.ilosc,
+    unit: row.jednostka,
+    price: row.cena,
+    status: row.status
+  }});
+
+  res.status(200).send(mappedRows);
 });
 
 module.exports = router;
