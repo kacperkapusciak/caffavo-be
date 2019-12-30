@@ -50,26 +50,26 @@ VALUES ('szarlotka', 30, 'kilogram', 23, 2);
 
 DELETE FROM skladniki;
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('lavazza qualita oro', 125.25, 'kilogram', 50.98, 'dostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('lavazza qualita oro', 125.25, 'kilogram', 50.98);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('kimbo aroma gold', 54.50, 'kilogram', 71.60, 'dostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('kimbo aroma gold', 54.50, 'kilogram', 71.60);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('dallmayr crema doro', 25, 'kilogram', 38.70, 'dostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('dallmayr crema doro', 25, 'kilogram', 38.70);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('mleko krowie pełne', 200, 'litr', 2.30, 'dostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('mleko krowie pełne', 200, 'litr', 2.30);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('mleko sojowe', 0, 'litr', 5.15, 'niedostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('mleko sojowe', 0, 'litr', 5.15);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('mleko owcze', 4, 'litr', 14.99, 'niska_dostepnosc');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('mleko owcze', 4, 'litr', 14.99);
 
-INSERT INTO skladniki (nazwa, ilosc, jednostka, cena, status)
-VALUES ('cukier', 2000, 'kostka', 0.10, 'dostepny');
+INSERT INTO skladniki (nazwa, ilosc, jednostka, cena)
+VALUES ('cukier', 2000, 'kostka', 0.10);
 
 DELETE FROM rodzaje_kawy;
 

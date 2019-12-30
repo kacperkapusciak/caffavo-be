@@ -24,3 +24,26 @@ CREATE TRIGGER aktualizuj_cene_kawy
 AFTER INSERT OR UPDATE OR DELETE ON przepisy
 FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_cene_kawy();
 
+-- aktualizacja statusu składnika
+
+CREATE OR REPLACE FUNCTION zaaktualizuj_status_skladnika() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+        IF NEW.ilosc = 0 THEN
+            NEW.status = 'niedostepny'::status_skladnika;
+        ELSIF NEW.ilosc < 30 AND NEW.jednostka='kilogram'::jednostka_skladnik OR
+                NEW.ilosc < 10 AND NEW.jednostka='litr'::jednostka_skladnik OR
+                NEW.ilosc < 100 AND NEW.jednostka='kostka'::jednostka_skladnik THEN
+            NEW.status = 'niska_dostepnosc'::status_skladnika;
+        ELSE
+            NEW.status = 'dostepny'::status_skladnika;
+        END IF;
+
+        RETURN NEW;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS aktualizuj_status_skladnika ON skladniki;
+
+CREATE TRIGGER aktualizuj_status_skladnika
+BEFORE INSERT OR UPDATE ON skladniki
+FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_skladnika();
