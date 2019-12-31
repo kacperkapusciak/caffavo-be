@@ -6,7 +6,9 @@ const db = require('../db');
 const router = new Router();
 
 router.get('/', async (req, res) => {
-  const { rows } = await db.query(sql`SELECT * FROM skladniki`);
+  const { rows } = await db.query(sql`
+    SELECT * FROM skladniki ORDER BY jednostka ASC
+  `);
 
   const mappedRows = rows.map(row => ({
     id: row.id,
