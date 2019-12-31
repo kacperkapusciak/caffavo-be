@@ -54,4 +54,16 @@ router.put('/:id', async (req, res) => {
   res.status(200).send();
 });
 
+router.delete('/:id', async (req, res) => {
+  try {
+    await db.query(sql`
+      DELETE FROM skladniki
+      WHERE id=${req.params.id}`);
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+
+  res.status(200).send();
+});
+
 module.exports = router;
