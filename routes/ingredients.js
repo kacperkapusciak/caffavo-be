@@ -7,7 +7,7 @@ const router = new Router();
 
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`
-    SELECT * FROM skladniki ORDER BY jednostka ASC
+    SELECT * FROM skladniki ORDER BY jednostka ASC, ilosc DESC
   `);
 
   const mappedRows = rows.map(row => ({
