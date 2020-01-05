@@ -22,10 +22,7 @@ router.get('/', async (req, res) => {
     price: row.cena
   }));
 
-  const offer = {
-    coffeeTypes: mappedCoffeeRows,
-    bakery: mappedBakeryRows
-  };
+  const offer = [...mappedCoffeeRows, ...mappedBakeryRows];
 
   res.status(200).send(offer);
 });
