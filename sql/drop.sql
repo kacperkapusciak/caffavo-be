@@ -1,14 +1,10 @@
-DROP TYPE "status_zamowienia";
+DROP VIEW "pelne_dane_uzytkownika";
 
-DROP TYPE "status_skladnika";
+DROP VIEW "konto_bankowe";
 
-DROP TYPE "jednostka_skladnik";
+DROP VIEW "oferta_wyrobow_cukierniczych";
 
-DROP TYPE "jednostka_wyrob_cukierniczy";
-
-DROP TYPE "ocena";
-
-DROP TYPE "ilosc_cukru";
+DROP VIEW "oferta_kaw";
 
 DROP TABLE "adres" CASCADE;
 
@@ -33,3 +29,15 @@ DROP TABLE "transakcje" CASCADE;
 DROP TABLE "zamowiona_kawa" CASCADE;
 
 DROP TABLE "zamowiony_wyrob_cukierniczy" CASCADE;
+
+DROP TYPE "status_zamowienia";
+
+DROP TYPE "status_produktu";
+
+DROP TYPE "jednostka_skladnik";
+
+DROP TYPE "jednostka_wyrob_cukierniczy";
+
+DROP TYPE "ocena";
+
+DROP TYPE "ilosc_cukru";

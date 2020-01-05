@@ -26,24 +26,47 @@ FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_cene_kawy();
 
 -- aktualizacja statusu składnika
 
-CREATE OR REPLACE FUNCTION zaaktualizuj_status_skladnika() RETURNS TRIGGER AS $emp_audit$
+CREATE OR REPLACE FUNCTION zaaktualizuj_status_produktu() RETURNS TRIGGER AS $emp_audit$
     BEGIN
         IF NEW.ilosc = 0 THEN
-            NEW.status = 'niedostepny'::status_skladnika;
+            NEW.status = 'niedostepny'::status_produktu;
         ELSIF NEW.ilosc < 30 AND NEW.jednostka='kilogram'::jednostka_skladnik OR
                 NEW.ilosc < 10 AND NEW.jednostka='litr'::jednostka_skladnik OR
                 NEW.ilosc < 100 AND NEW.jednostka='kostka'::jednostka_skladnik THEN
-            NEW.status = 'niska_dostepnosc'::status_skladnika;
+            NEW.status = 'niska_dostepnosc'::status_produktu;
         ELSE
-            NEW.status = 'dostepny'::status_skladnika;
+            NEW.status = 'dostepny'::status_produktu;
         END IF;
 
         RETURN NEW;
     END;
 $emp_audit$ LANGUAGE plpgsql;
 
-DROP TRIGGER IF EXISTS aktualizuj_status_skladnika ON skladniki;
+DROP TRIGGER IF EXISTS aktualizuj_status_produktu ON skladniki;
 
-CREATE TRIGGER aktualizuj_status_skladnika
+CREATE TRIGGER aktualizuj_status_produktu
 BEFORE INSERT OR UPDATE ON skladniki
-FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_skladnika();
+FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_produktu();
+
+-- aktualizacja statusu wyrobu cukierniczego
+
+CREATE OR REPLACE FUNCTION zaaktualizuj_status_wyrobu_cukierniczego() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+        IF NEW.ilosc = 0 THEN
+            NEW.status = 'niedostepny'::status_produktu;
+        ELSIF NEW.ilosc < 50 AND NEW.jednostka='kilogram'::jednostka_wyrob_cukierniczy OR
+                NEW.ilosc < 400 AND NEW.jednostka='sztuka'::jednostka_wyrob_cukierniczy THEN
+            NEW.status = 'niska_dostepnosc'::status_produktu;
+        ELSE
+            NEW.status = 'dostepny'::status_produktu;
+        END IF;
+
+        RETURN NEW;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS aktualizuj_status_wyrobu_cukierniczego ON wyroby_cukiernicze;
+
+CREATE TRIGGER aktualizuj_status_wyrobu_cukierniczego
+BEFORE INSERT OR UPDATE ON wyroby_cukiernicze
+FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_wyrobu_cukierniczego();

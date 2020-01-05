@@ -1,3 +1,10 @@
+-- kapitał zakładowy
+
+DELETE FROM transakcje;
+
+INSERT INTO transakcje (wartosc, tytul)
+VALUES (2000, 'Kapitał zakładowy');
+
 DELETE FROM uzytkownik;
 
 INSERT INTO uzytkownik (email, haslo, admin)
@@ -36,17 +43,23 @@ WHERE email='user-2@caffavo.com';
 
 DELETE FROM wyroby_cukiernicze;
 
-INSERT INTO wyroby_cukiernicze (nazwa, ilosc, jednostka, cena, marza)
-VALUES ('ciasteczka korzenne', 100, 'sztuka', 0.5, 0.2);
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('ciasteczka korzenne', 1, 2000, 'sztuka', 0.5, 0.2);
 
-INSERT INTO wyroby_cukiernicze (nazwa, ilosc, jednostka, cena, marza)
-VALUES ('sernik', 20, 'kilogram', 20, 3);
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('ciasteczka imbirowe', 1, 150, 'sztuka', 0.6, 0.25);
 
-INSERT INTO wyroby_cukiernicze (nazwa, ilosc, jednostka, cena, marza)
-VALUES ('murzynek', 14, 'kilogram', 18, 4);
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('sernik', 0.15, 200, 'kilogram', 20, 3);
 
-INSERT INTO wyroby_cukiernicze (nazwa, ilosc, jednostka, cena, marza)
-VALUES ('szarlotka', 30, 'kilogram', 23, 2);
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('murzynek', 0.15, 49, 'kilogram', 18, 4);
+
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('szarlotka', 0.15, 30, 'kilogram', 23, 2);
+
+INSERT INTO wyroby_cukiernicze (nazwa, porcja, ilosc, jednostka, cena, marza)
+VALUES ('pychotka', 0.15, 0, 'kilogram', 27, 4);
 
 DELETE FROM skladniki;
 

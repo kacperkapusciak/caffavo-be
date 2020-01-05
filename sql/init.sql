@@ -1,3 +1,5 @@
+-- TYPY
+
 CREATE TYPE "status_zamowienia" AS ENUM (
   'zlozone',
   'przyjete_do_realizacji',
@@ -6,7 +8,7 @@ CREATE TYPE "status_zamowienia" AS ENUM (
   'anulowane'
 );
 
-CREATE TYPE "status_skladnika" AS ENUM (
+CREATE TYPE "status_produktu" AS ENUM (
   'niedostepny',
   'niska_dostepnosc',
   'dostepny'
@@ -38,6 +40,8 @@ CREATE TYPE "ilosc_cukru" AS ENUM (
   '2',
   '3'
 );
+
+-- TABELE
 
 CREATE TABLE "adres" (
   "id" SERIAL PRIMARY KEY,
@@ -97,7 +101,8 @@ CREATE TABLE "rodzaje_kawy" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar UNIQUE NOT NULL,
   "cena_skladnikow" numeric(5,2) DEFAULT 0,
-  "marza" numeric(5,2) DEFAULT 0
+  "marza" numeric(5,2) DEFAULT 0,
+  "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
 CREATE TABLE "skladniki" (
@@ -106,7 +111,7 @@ CREATE TABLE "skladniki" (
   "ilosc" numeric(6,2) NOT NULL DEFAULT 0,
   "jednostka" jednostka_skladnik NOT NULL,
   "cena" numeric(5,2) NOT NULL DEFAULT 0,
-  "status" status_skladnika NOT NULL DEFAULT 'niedostepny'
+  "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
 CREATE TABLE "przepisy" (
@@ -120,10 +125,12 @@ CREATE TABLE "przepisy" (
 CREATE TABLE "wyroby_cukiernicze" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar NOT NULL,
-  "ilosc" numeric(5,2) NOT NULL,
+  "porcja" numeric(5,2) NOT NULL,
+  "ilosc" numeric(6,2) NOT NULL,
   "jednostka" jednostka_wyrob_cukierniczy NOT NULL DEFAULT 'sztuka',
   "cena" numeric(5,2) NOT NULL DEFAULT 0,
-  "marza" numeric(5,2) DEFAULT 0
+  "marza" numeric(5,2) DEFAULT 0,
+  "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
 CREATE TABLE "transakcje" (
@@ -132,7 +139,6 @@ CREATE TABLE "transakcje" (
   "wartosc" numeric(6,2) NOT NULL,
   "tytul" varchar(100) NOT NULL,
   "zamowienie_id" int,
-  "stan_konta" numeric(10,2) NOT NULL DEFAULT 0,
   FOREIGN KEY ("zamowienie_id") REFERENCES "zamowienia" ("id")
 );
 
@@ -150,3 +156,35 @@ CREATE TABLE "zamowiony_wyrob_cukierniczy" (
   FOREIGN KEY ("zamowiony_produkt_id") REFERENCES "zamowiony_produkt" ("id"),
   FOREIGN KEY ("wyrob_cukierniczy_id") REFERENCES "wyroby_cukiernicze" ("id")
 );
+
+-- WIDOKI
+
+CREATE VIEW "pelne_dane_uzytkownika"
+AS SELECT
+  u.id, email, zarejestrowany_o, imie, nazwisko, telefon, ulica, nr_budynku, nr_lokalu, kod_pocztowy, miasto
+FROM uzytkownik u
+LEFT JOIN adres a ON a.id = u.adres_id;
+
+CREATE VIEW "konto_bankowe"
+AS SELECT
+ COUNT(id) as ilosc_transakcji,
+ SUM(wartosc) as stan_konta,
+ COUNT(CASE WHEN wartosc > 0 THEN 1 END) as ilosc_wplywow,
+ COUNT(CASE WHEN wartosc < 0 THEN 1 END) as ilosc_wyplywow
+FROM transakcje;
+
+CREATE VIEW "oferta_wyrobow_cukierniczych"
+AS SELECT
+  id as wyrob_cukierniczy_id,
+  nazwa,
+  ROUND((cena + marza) * porcja, 2) as cena
+FROM wyroby_cukiernicze
+WHERE status != 'niedostepny';
+
+CREATE VIEW "oferta_kaw"
+AS SELECT
+  id as rodzaj_kawy_id,
+  nazwa,
+  cena_skladnikow + marza as cena
+FROM rodzaje_kawy
+WHERE status != 'niedostepny';
