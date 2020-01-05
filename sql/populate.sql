@@ -3,7 +3,7 @@
 DELETE FROM transakcje;
 
 INSERT INTO transakcje (wartosc, tytul)
-VALUES (2000, 'Kapitał zakładowy');
+VALUES (50000, 'Kapitał zakładowy');
 
 DELETE FROM uzytkownik;
 
@@ -94,6 +94,9 @@ VALUES ('cappucino', 2.50);
 
 INSERT INTO rodzaje_kawy (nazwa, marza)
 VALUES ('latte z sojowym mlekiem', 2.50);
+
+INSERT INTO rodzaje_kawy (nazwa, marza)
+VALUES ('americano kokosowe', 4.20);
 
 DELETE FROM przepisy;
 -- espresso

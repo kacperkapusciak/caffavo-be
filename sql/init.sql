@@ -136,7 +136,7 @@ CREATE TABLE "wyroby_cukiernicze" (
 CREATE TABLE "transakcje" (
   "id" SERIAL PRIMARY KEY,
   "wykonana_o" timestamp DEFAULT (now()),
-  "wartosc" numeric(6,2) NOT NULL,
+  "wartosc" numeric(9,2) NOT NULL,
   "tytul" varchar(100) NOT NULL,
   "zamowienie_id" int,
   FOREIGN KEY ("zamowienie_id") REFERENCES "zamowienia" ("id")

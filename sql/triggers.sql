@@ -24,6 +24,36 @@ CREATE TRIGGER aktualizuj_cene_kawy
 AFTER INSERT OR UPDATE OR DELETE ON przepisy
 FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_cene_kawy();
 
+-- aktualizacja statusu dostępności kawy
+
+CREATE OR REPLACE FUNCTION zaaktualizuj_status_kawy() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+        UPDATE rodzaje_kawy
+        SET status = sub.status
+        FROM (
+            SELECT
+                rodzaj_kawy_id,
+                CASE
+                    WHEN EVERY(status='dostepny' OR status='niska_dostepnosc') THEN 'dostepny'::status_produktu
+                ELSE
+                    'niedostepny'::status_produktu
+                END as status
+            FROM przepisy p
+            JOIN skladniki s
+            ON s.id = p.skladnik_id
+            GROUP BY rodzaj_kawy_id
+        ) as sub
+        WHERE id = sub.rodzaj_kawy_id;
+        RETURN NULL;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS aktualizuj_status_kawy ON przepisy;
+
+CREATE TRIGGER aktualizuj_status_kawy
+AFTER INSERT OR UPDATE OR DELETE ON przepisy
+FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_kawy();
+
 -- aktualizacja statusu składnika
 
 CREATE OR REPLACE FUNCTION zaaktualizuj_status_produktu() RETURNS TRIGGER AS $emp_audit$
@@ -70,3 +100,53 @@ DROP TRIGGER IF EXISTS aktualizuj_status_wyrobu_cukierniczego ON wyroby_cukierni
 CREATE TRIGGER aktualizuj_status_wyrobu_cukierniczego
 BEFORE INSERT OR UPDATE ON wyroby_cukiernicze
 FOR EACH ROW EXECUTE PROCEDURE zaaktualizuj_status_wyrobu_cukierniczego();
+
+-- dodanie transakcji po kupnie skladnikow
+
+CREATE OR REPLACE FUNCTION kup_skladnik() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+        IF (TG_OP = 'INSERT') THEN
+            IF (NEW.ilosc > 0) THEN
+                INSERT INTO transakcje (wartosc, tytul)
+                VALUES (-1 * NEW.ilosc * NEW.cena, CONCAT('Kupno skladnika: ', NEW.nazwa));
+            END IF;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            IF (NEW.ilosc > OLD.ilosc) THEN
+                INSERT INTO transakcje (wartosc, tytul)
+                VALUES (-1 * NEW.ilosc * NEW.cena, CONCAT('Kupno skladnika: ', NEW.nazwa));
+            END IF;
+        END IF;
+        RETURN NEW;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS kupno_skladnika ON skladniki;
+
+CREATE TRIGGER kupno_skladnika
+AFTER INSERT OR UPDATE ON skladniki
+FOR EACH ROW EXECUTE PROCEDURE kup_skladnik();
+
+-- dodanie transakcji po kupnie wyrobu cukierniczego
+
+CREATE OR REPLACE FUNCTION kup_wyrob_cukierniczy() RETURNS TRIGGER AS $emp_audit$
+    BEGIN
+        IF (TG_OP = 'INSERT') THEN
+            IF (NEW.ilosc > 0) THEN
+                INSERT INTO transakcje (wartosc, tytul)
+                VALUES (-1 * NEW.ilosc * NEW.cena, CONCAT('Kupno wyrobu cukierniczego: ', NEW.nazwa));
+            END IF;
+        ELSIF (TG_OP = 'UPDATE') THEN
+            IF (NEW.ilosc > OLD.ilosc) THEN
+                INSERT INTO transakcje (wartosc, tytul)
+                VALUES (-1 * NEW.ilosc * NEW.cena, CONCAT('Kupno wyrobu cukierniczego: ', NEW.nazwa));
+            END IF;
+        END IF;
+        RETURN NEW;
+    END;
+$emp_audit$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS kupno_wyrobu_cukierniczego ON wyroby_cukiernicze;
+
+CREATE TRIGGER kupno_wyrobu_cukierniczego
+AFTER INSERT OR UPDATE ON wyroby_cukiernicze
+FOR EACH ROW EXECUTE PROCEDURE kup_wyrob_cukierniczy();
