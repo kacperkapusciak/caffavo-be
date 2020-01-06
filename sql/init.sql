@@ -77,12 +77,12 @@ CREATE TABLE "opinie" (
 CREATE TABLE "zamowienia" (
   "id" SERIAL PRIMARY KEY,
   "uzytkownik_id" int NOT NULL,
-  "adres_id" int NOT NULL,
+  "adres_id" int,
   "status" status_zamowienia NOT NULL DEFAULT 'zlozone',
   "data_zlozenia" timestamp DEFAULT (now()),
   "data_realizacji" timestamp,
   "koszt" numeric(5,2) NOT NULL,
-  "koszt_dostawy" numeric(5,2),
+  "koszt_dostawy" numeric(5,2) DEFAULT 5,
   "oplacone" boolean DEFAULT false,
   "opinie_id" int,
   FOREIGN KEY ("uzytkownik_id") REFERENCES "uzytkownik"("id"),
@@ -188,3 +188,23 @@ AS SELECT
   cena_skladnikow + marza as cena
 FROM rodzaje_kawy
 WHERE status != 'niedostepny';
+
+CREATE VIEW "zamowione_produkty"
+AS SELECT
+    z.id as zamowienie_id,
+    zp.id as zamowiony_produkt_id,
+    CASE
+        WHEN ok.nazwa IS NULL THEN owc.nazwa
+        ELSE ok.nazwa
+    END,
+    zp.ilosc,
+    CASE
+        WHEN ok.cena IS NULL THEN owc.cena
+        ELSE ok.cena
+    END
+FROM zamowienia z
+LEFT JOIN zamowiony_produkt zp ON z.id= zp.zamowienie_id
+LEFT JOIN zamowiona_kawa zk ON zp.id = zk.zamowiony_produkt_id
+LEFT JOIN oferta_kaw ok ON zk.rodzaj_kawy_id = ok.rodzaj_kawy_id
+LEFT JOIN zamowiony_wyrob_cukierniczy zwc ON zp.id = zwc.zamowiony_produkt_id
+LEFT JOIN oferta_wyrobow_cukierniczych owc ON zwc.wyrob_cukierniczy_id = owc.wyrob_cukierniczy_id;

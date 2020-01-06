@@ -2,6 +2,8 @@ DROP VIEW "pelne_dane_uzytkownika";
 
 DROP VIEW "konto_bankowe";
 
+DROP VIEW "zamowione_produkty";
+
 DROP VIEW "oferta_wyrobow_cukierniczych";
 
 DROP VIEW "oferta_kaw";
