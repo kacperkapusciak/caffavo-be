@@ -12,34 +12,57 @@ router.get('/', async (req, res) => {
   return res.status(200).send(rows);
 });
 
-router.get('/user/:id', async (req, res) => {
-  const { rows } = await db.query(sql`
-    SELECT * FROM zamowienia
-    WHERE uzytkownik_id=${req.params.id};
-  `);
-
-  if (!rows.length) return res.status(404).send();
-  return res.status(200).send(rows);
-});
-
 router.get('/:id', async (req, res) => {
-  const { rows } = await db.query(sql`
+  const order = await db.query(sql`
     SELECT * FROM zamowienia
     WHERE id=${req.params.id}
   `);
+  if (!order.rows.length) return res.status(404).send();
 
-  if (!rows.length) return res.status(404).send();
-  return res.status(200).send(rows[0]);
-});
-
-router.get('/:id/items', async (req, res) => {
-  const { rows } = await db.query(sql`
+  const orderedItems = await db.query(sql`
     SELECT * FROM zamowione_produkty
     WHERE zamowienie_id=${req.params.id}
   `);
 
-  if (!rows.length) return res.status(404).send();
-  return res.status(200).send(rows[0]);
+  const userId = order.rows[0].uzytkownik_id;
+
+  const userInfo = await db.query(sql`
+    SELECT * FROM pelne_dane_uzytkownika
+    WHERE id=${userId}
+  `);
+
+  const mappedOrderedItems = orderedItems.rows.map(item => ({
+    id: item.zamowiony_produkt_id,
+    name: item.nazwa,
+    amount: item.ilosc,
+    price: item.cena
+  }));
+
+  const data = {
+    id: order.rows[0].id,
+    user: {
+      id: userInfo.rows[0].id,
+      email: userInfo.rows[0].email,
+      registeredAt: userInfo.rows[0].zarejestrowany_o,
+      firstName: userInfo.rows[0].imie,
+      lastName: userInfo.rows[0].nazwisko,
+      phone: userInfo.rows[0].telefon,
+      street: userInfo.rows[0].ulica,
+      building: userInfo.rows[0].nr_budynku,
+      apartment: userInfo.rows[0].nr_lokalu,
+      postal: userInfo.rows[0].kod_pocztowy,
+      city: userInfo.rows[0].miasto
+    },
+    status: order.rows[0].status,
+    createdAt: order.rows[0].data_zlozenia,
+    completedAt: order.rows[0].data_realizacji,
+    price: order.rows[0].koszt,
+    deliveryCost: order.rows[0].koszt_dostawy,
+    payed: order.rows[0].oplacone,
+    orderedItems: mappedOrderedItems
+  };
+
+  return res.status(200).send(data);
 });
 
 router.post('/', async (req, res) => {
