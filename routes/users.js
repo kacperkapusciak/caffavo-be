@@ -54,10 +54,45 @@ router.post('/', async (req, res) => {
         VALUES (${email}, ${password}, ${firstName}, ${lastName}, ${phone})`);
     }
   } catch (err) {
-      return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
+    return res.status(409).send('Konto z podanym adresem e-mail już istnieje.');
   }
 
   res.status(200).send();
+});
+
+router.put('/:id', async (req, res) => {
+  const { firstName, lastName, phone, street, building, apartment, postal, city } = req.body;
+
+  const { rows } = await db.query(sql`
+    UPDATE uzytkownik
+    SET imie=${firstName}, nazwisko=${lastName}, telefon=${phone}
+    WHERE id=${req.params.id}
+    RETURNING adres_id
+  `);
+
+  if (rows[0].adres_id) {
+    await db.query(sql`
+      UPDATE adres
+      SET ulica=${street}, nr_budynku=${building},
+      nr_lokalu=${apartment}, kod_pocztowy=${postal},
+      miasto=${city}
+      WHERE id=${rows[0].adres_id}
+    `);
+  } else {
+    const { rows } = await db.query(sql`
+      INSERT INTO adres (ulica, nr_budynku, nr_lokalu, kod_pocztowy, miasto)
+      VALUES (${street}, ${building}, ${apartment}, ${postal}, ${city})
+      RETURNING id
+    `);
+    const { id } = rows[0];
+    await db.query(sql`
+      UPDATE uzytkownik
+      SET adres_id=${id}
+      WHERE id=${req.params.id}
+    `);
+  }
+
+  return res.status(200).send();
 });
 
 module.exports = router;
