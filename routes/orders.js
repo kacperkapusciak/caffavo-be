@@ -135,4 +135,14 @@ router.post('/', async (req, res) => {
   return res.status(200).send({ id: orderId });
 });
 
+router.put('/:id/pay', async (req, res) => {
+  await db.query(sql`
+    UPDATE zamowienia
+    SET oplacone='true'
+    WHERE id=${req.params.id}
+  `);
+
+  return res.status(200).send();
+});
+
 module.exports = router;
