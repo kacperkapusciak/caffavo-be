@@ -35,7 +35,9 @@ router.get('/:id', async (req, res) => {
     id: item.zamowiony_produkt_id,
     name: item.nazwa,
     amount: item.ilosc,
-    price: item.cena
+    price: item.cena,
+    sugar: item.ilosc_cukru,
+    type: item.typ
   }));
 
   const data = {

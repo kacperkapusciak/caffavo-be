@@ -195,13 +195,18 @@ AS SELECT
     zp.id as zamowiony_produkt_id,
     CASE
         WHEN ok.nazwa IS NULL THEN owc.nazwa
-        ELSE ok.nazwa
-    END,
+        WHEN owc.nazwa IS NULL THEN ok.nazwa
+    END as nazwa,
     zp.ilosc,
     CASE
         WHEN ok.cena IS NULL THEN owc.cena
-        ELSE ok.cena
-    END
+        WHEN owc.cena IS NULL THEN ok.cena
+    END as cena,
+    zk.ilosc_cukru,
+    CASE
+        WHEN ok.rodzaj_kawy_id IS NULL THEN 'bakery'
+        WHEN owc.wyrob_cukierniczy_id IS NULL THEN 'coffee'
+    END as typ
 FROM zamowienia z
 LEFT JOIN zamowiony_produkt zp ON z.id= zp.zamowienie_id
 LEFT JOIN zamowiona_kawa zk ON zp.id = zk.zamowiony_produkt_id
