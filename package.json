@@ -16,6 +16,7 @@
     "sql-template-strings": "^2.2.2"
   },
   "devDependencies": {
+    "jsdoc": "^3.6.3",
     "nodemon": "^2.0.2"
   }
 }
