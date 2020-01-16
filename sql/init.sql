@@ -213,3 +213,14 @@ LEFT JOIN zamowiona_kawa zk ON zp.id = zk.zamowiony_produkt_id
 LEFT JOIN oferta_kaw ok ON zk.rodzaj_kawy_id = ok.rodzaj_kawy_id
 LEFT JOIN zamowiony_wyrob_cukierniczy zwc ON zp.id = zwc.zamowiony_produkt_id
 LEFT JOIN oferta_wyrobow_cukierniczych owc ON zwc.wyrob_cukierniczy_id = owc.wyrob_cukierniczy_id;
+
+CREATE VIEW "ulubiona_kawa"
+AS SELECT
+    uzytkownik_id, rodzaj_kawy_id, ROUND(SUM(zp.ilosc)) as ile_razy_zamowiona
+FROM zamowienia z
+INNER JOIN zamowiony_produkt zp
+ON z.id = zp.zamowienie_id
+INNER JOIN zamowiona_kawa zk
+ON zp.id = zk.zamowiony_produkt_id
+GROUP BY rodzaj_kawy_id, uzytkownik_id
+ORDER BY ile_razy_zamowiona DESC;

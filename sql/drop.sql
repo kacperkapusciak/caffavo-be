@@ -6,6 +6,8 @@ DROP VIEW "zamowione_produkty";
 
 DROP VIEW "oferta_wyrobow_cukierniczych";
 
+DROP VIEW "ulubiona_kawa";
+
 DROP VIEW "oferta_kaw";
 
 DROP TABLE "adres" CASCADE;

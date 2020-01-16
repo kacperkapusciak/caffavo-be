@@ -56,4 +56,65 @@ router.get('/', async (req, res) => {
   res.status(200).send(offer);
 });
 
+/**
+ *  Przeznaczenie: Zwraca id najczęściej zamawianej kawy,
+ *                 przy podaniu odpowiedniego query string - id najczęściej
+ *                 zamawianej kawy przez danego użytkownika
+ *  Metoda: GET
+ *  URL: 'offer/favouritecoffee' | 'offer/favouritecoffee?user=:id'
+ *  Parametr: [id] - id użytkownika
+ *
+ *  Struktura odpowiedzi:
+ *  {
+ *    coffeeTypeId: Integer
+ *    name: String
+ *    price: Float
+ *    timesOrdered: Integer
+ *  }
+ *
+ *  Przykładowa odpowiedź:
+ *  {
+ *    "coffeeTypeId": 2,
+ *    "name": "cappucino",
+ *    "price": 7.79,
+ *    "timesOrdered": 25
+ *  }
+ * */
+router.get('/favouritecoffee', async (req, res) => {
+  let query;
+
+  if (!req.query.user) {
+    query = sql`
+      SELECT uk.rodzaj_kawy_id, nazwa, cena, SUM(ile_razy_zamowiona) as ile_razy_zamowiona 
+      FROM ulubiona_kawa uk
+      INNER JOIN oferta_kaw ok
+      ON uk.rodzaj_kawy_id = ok.rodzaj_kawy_id
+      GROUP BY uk.rodzaj_kawy_id, nazwa, cena
+      ORDER BY ile_razy_zamowiona DESC
+      LIMIT 1;
+  `;
+  } else {
+    query = sql`
+      SELECT uk.rodzaj_kawy_id, nazwa, cena, ile_razy_zamowiona 
+      FROM ulubiona_kawa uk
+      INNER JOIN oferta_kaw ok
+      ON uk.rodzaj_kawy_id = ok.rodzaj_kawy_id
+      WHERE uzytkownik_id=${req.query.user}
+      ORDER BY ile_razy_zamowiona DESC
+      LIMIT 1
+    `;
+  }
+
+  const { rows } = await db.query(query);
+
+  const mappedRow = {
+    coffeeTypeId: rows[0].rodzaj_kawy_id,
+    name: rows[0].nazwa,
+    price: parseFloat(rows[0].cena),
+    timesOrdered: parseInt(rows[0].ile_razy_zamowiona)
+  };
+
+  res.status(200).send(mappedRow);
+});
+
 module.exports = router;
