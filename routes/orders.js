@@ -261,26 +261,26 @@ router.get('/:id', async (req, res) => {
  *  {
  *  	userId: 2,
  *  	items: [
- *  		{
- *  			coffeeTypeId: Integer | bakeryId: Integer
- *  			amount: Float
- *  		},
- *  		{ ... }
+ *  	  {
+ *  		  coffeeTypeId: Integer | bakeryId: Integer
+ *  		  amount: Float
+ *  	  },
+ *  	  { ... }
  *  	]
  *  }
  *  Przykładowe zapytanie:
  *  {
- *  	"userId": 2,
- *  	"items": [
- *  		{
- *  			"coffeeTypeId": 2,
- *  			"amount": 3
- *  		},
- *  		{
- *  			"bakeryId": 1,
- *  			"amount": 10
- *  		}
- *  	]
+ *    "userId": 2,
+ *    "items": [
+ *      {
+ *        "coffeeTypeId": 2,
+ *        "amount": 3
+ *      },
+ *      {
+ *        "bakeryId": 1,
+ *        "amount": 10
+ *      }
+ *    ]
  *  }
  *
  *  Struktura odpowiedzi:
