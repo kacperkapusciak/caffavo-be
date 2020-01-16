@@ -5,12 +5,95 @@ const db = require('../db');
 
 const router = new Router();
 
-/** Zwraca wszystkich uzytkownikow */
+/**
+ *  Przeznaczenie: Zwraca wszystkich uzytkownikow dostepnych w bazie
+ *  Metoda: GET
+ *  URL: 'users/'
+ *
+ *  Struktura odpowiedzi:
+ *  [
+ *    {
+ *      id: Integer
+ *      email: String
+ *      password: String
+ *      admin: Boolean
+ *      registeredAt: Timestamp
+ *      firstName: String | null
+ *      lastName: String | null
+ *      phone: String | null
+ *      addressId: Integer | null
+ *    },
+ *    { ... }
+ *  ]
+ *
+ *  Przykładowa odpowiedź:
+ *  [
+ *    {
+ *      "id": 2,
+ *      "email": "user@caffavo.com",
+ *      "password": "qwertyuiop",
+ *      "admin": false,
+ *      "registeredAt": "2020-01-15T19:28:03.148Z",
+ *      "firstName": "Jan",
+ *      "lastName": "Kowalski",
+ *      "phone": "+48555666777",
+ *      "addressId": 1
+ *    },
+ *    { ... }
+ *  ]
+ * */
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`SELECT * FROM uzytkownik`);
-  res.status(200).send(rows);
+
+  const mappedRows = rows.map(row => ({
+    id: row.id,
+    email: row.email,
+    password: row.haslo,
+    admin: row.admin,
+    registeredAt: row.zarejestrowany_o,
+    firstName: row.imie,
+    lastName: row.nazwisko,
+    phone: row.telefon,
+    addressId: row.adres_id,
+  }));
+
+  res.status(200).send(mappedRows);
 });
 
+/**
+ *  Przeznaczenie: Zwraca użytkownika o podanym id
+ *  Metoda: GET
+ *  URL: 'users/:id'
+ *  Parametr: [id] - id użytkownika
+ *
+ *  Struktura odpowiedzi:
+ *  {
+ *    email: String
+ *    registeredAt: Timestamp
+ *    firstName: String | null
+ *    lastName: String | null
+ *    phone: String | null
+ *    street: String | null
+ *    building: String | null
+ *    apartment: String | null
+ *    postal: String | null
+ *    city: String | null
+ *  }
+ *
+ *  Przykładowa odpowiedź:
+ *  {
+ *    "email": "user@caffavo.com",
+ *    "registeredAt": "2020-01-15T19:28:03.148Z",
+ *    "firstName": "Jan",
+ *    "lastName": "Kowalski",
+ *    "phone": "+48555666777",
+ *    "street": "Pawia",
+ *    "building": "7",
+ *    "apartment": "3",
+ *    "postal": "00-000",
+ *    "city": "Warszawa"
+ *  }
+ * */
 router.get('/:id', async (req, res) => {
   const { rows } = await db.query(sql`
     SELECT * FROM pelne_dane_uzytkownika
@@ -37,7 +120,29 @@ router.get('/:id', async (req, res) => {
   res.status(200).send(mappedRow);
 });
 
-/** Rejestracja użytkownika */
+/**
+ * Przeznaczenie: Rejestracja użytkownika
+ * Metoda: POST
+ * URL: 'users/'
+ *
+ *  Struktura zapytania:
+ *  {
+ *  	email: String
+ *  	password: String
+ *  	firstName: String | null
+ *  	lastName: String | null
+ *  	phone: String
+ *  }
+ *
+ *  Przykładowe zapytanie:
+ *  {
+ *  	"email": "user-3@caffavo.com",
+ *  	"password": "1234567890",
+ *  	"firstName": "User",
+ *  	"lastName": "Caffavo",
+ *  	"phone": "+49694202137"
+ *  }
+ * */
 router.post('/', async (req, res) => {
   const { email, password, firstName, lastName, phone } = req.body;
 
@@ -60,6 +165,36 @@ router.post('/', async (req, res) => {
   res.status(200).send();
 });
 
+/**
+ * Przeznaczenie: Edycja danych użytkownika, włącznie z adresem
+ * Metoda: PUT
+ * URL: 'users/:id'
+ * Parametr: [id]
+ *
+ *  Struktura zapytania:
+ *  {
+ *  	firstName: String | null
+ *  	lastName: String | null
+ *  	phone: String | null
+ *    street: String | null
+ *    building: String | null
+ *    apartment: String | null
+ *    postal: String | null
+ *    city: String | null
+ *  }
+ *
+ *  Przykładowe zapytanie:
+ *  {
+ *    "firstName": "Jan",
+ *    "lastName": "Kowalski",
+ *    "phone": "+48555666777",
+ *    "street": "Pawia",
+ *    "building": "7",
+ *    "apartment": "3",
+ *    "postal": "00-000",
+ *    "city": "Warszawa"
+ *  }
+ * */
 router.put('/:id', async (req, res) => {
   const { firstName, lastName, phone, street, building, apartment, postal, city } = req.body;
 

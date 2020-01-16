@@ -5,6 +5,37 @@ const db = require('../db');
 
 const router = new Router();
 
+/**
+ *  Przeznaczenie: Logowanie użytkownika
+ *  Metoda: POST
+ *  URL: 'auth/'
+ *
+ *  Struktura zapytania:
+ *  {
+ *    email: String
+ *    password: String
+ *  }
+ *
+ *  Przykładowe ciało zapytania:
+ *  {
+ *    "email": "nazwa@mail.com",
+ *    "password": "tupodajhaslo"
+ *  }
+ *
+ *  Struktura odpowiedzi:
+ *  {
+ *    id: Integer
+ *    email: String
+ *    admin: Boolean
+ *  }
+ *
+ *  Przykładowa odpowiedź:
+ *  {
+ *    "id": 1,
+ *    "email": "nazwa@mail.com",
+ *    "admin": false
+ *  }
+ * */
 router.post('/', async (req, res) => {
   let {email, password} = req.body;
 

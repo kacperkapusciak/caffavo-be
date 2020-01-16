@@ -5,6 +5,37 @@ const db = require('../db');
 
 const router = new Router();
 
+/**
+ *  Przeznaczenie: Zwraca wszystkie składniki
+ *  Metoda: GET
+ *  URL: 'ingredients/'
+ *
+ *  Struktura odpowiedzi:
+ *  [
+ *    {
+ *      id: Integer
+ *      name: String
+ *      amount: Float
+ *      unit: kilogram' | 'litr' | 'sztuka' | 'kostka'
+ *      price: Float
+ *      status: 'niedostepny' | 'niska_dostepnosc' | 'dostepny'
+ *    },
+ *    { ... }
+ *  ]
+ *
+ *  Przykładowa odpowiedź:
+ *  [
+ *    {
+ *      "id": 1,
+ *      "name": "lavazza qualita oro",
+ *      "amount": 125.25,
+ *      "unit": "kilogram",
+ *      "price": 50.98,
+ *      "status": "dostepny"
+ *    },
+ *    { ... }
+ *  ]
+ * */
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`
     SELECT * FROM skladniki ORDER BY jednostka ASC, ilosc DESC
@@ -13,16 +44,36 @@ router.get('/', async (req, res) => {
   const mappedRows = rows.map(row => ({
     id: row.id,
     name: row.nazwa,
-    amount: row.ilosc,
+    amount: parseFloat(row.ilosc),
     unit: row.jednostka,
-    price: row.cena,
+    price: parseFloat(row.cena),
     status: row.status
   }));
 
   res.status(200).send(mappedRows);
 });
 
-
+/**
+ *  Przeznaczenie: Dodawanie składnika
+ *  Metoda: POST
+ *  URL: 'ingredients/'
+ *
+ *  Struktura zapytania:
+ *  {
+ *    name: String
+ *    amount: Float
+ *    unit: 'kilogram' | 'litr' | 'sztuka' | 'kostka'
+ *    price: Float
+ *  }
+ *
+ *  Przykładowe ciało zapytania:
+ *  {
+ *  	"name": "syrop klonowy",
+ *  	"amount": 10.0,
+ *  	"unit": "litr",
+ *  	"price": 98.61
+ *  }
+ * */
 router.post('/', async (req, res) => {
   const { name, amount, unit, price } = req.body;
 
@@ -39,6 +90,28 @@ router.post('/', async (req, res) => {
   res.status(200).send();
 });
 
+/**
+ *  Przeznaczenie: Edycja składnika
+ *  Metoda: PUT
+ *  URL: 'ingredients/:id'
+ *  Parametr: [id] - id składnika
+ *
+ *  Struktura zapytania:
+ *  {
+ *    name: String
+ *    amount: Float
+ *    unit: 'kilogram' | 'litr' | 'sztuka' | 'kostka'
+ *    price: Float
+ *  }
+ *
+ *  Przykładowe ciało zapytania:
+ *  {
+ *  	"name": "lepszy syrop klonowy",
+ *  	"amount": 20.0,
+ *  	"unit": "litr",
+ *  	"price": 198.61
+ *  }
+ * */
 router.put('/:id', async (req, res) => {
   const { name, amount, unit, price } = req.body;
 
@@ -56,6 +129,12 @@ router.put('/:id', async (req, res) => {
   res.status(200).send();
 });
 
+/**
+ *  Przeznaczenie: Usunięcie składnika
+ *  Metoda: DELETE
+ *  URL: 'ingredients/:id'
+ *  Parametr: [id] - id składnika
+ * */
 router.delete('/:id', async (req, res) => {
   try {
     await db.query(sql`
