@@ -5,7 +5,36 @@ const db = require('../db');
 
 const router = new Router();
 
-/** Zwraca całą dostępną ofertę */
+/**
+ *  Przeznaczenie: Zwraca całą dostępną ofertę
+ *  Metoda: GET
+ *  URL: 'offer/'
+ *
+ *  Struktura odpowiedzi:
+ *  [
+ *    {
+ *      coffeeTypeId: Integer | bakeryId: Integer
+ *      name: String
+ *      price: Float
+ *    },
+ *    { ... }
+ *  ]
+ *
+ *  Przykładowa odpowiedź:
+ *  [
+ *    {
+ *      "coffeeTypeId": 1,
+ *      "name": "espresso",
+ *      "price": "6.57"
+ *    },
+ *    {
+ *      "bakeryId": 1,
+ *      "name": "ciasteczka korzenne",
+ *      "price": "0.70"
+ *    },
+ *    { ... }
+ *  ]
+ * */
 router.get('/', async (req, res) => {
   const { rows: coffeeRows } = await db.query(sql`SELECT * FROM oferta_kaw`);
   const { rows: bakeryRows } = await db.query(sql`SELECT * FROM oferta_wyrobow_cukierniczych`);

@@ -114,3 +114,28 @@ INSERT INTO przepisy (rodzaj_kawy_id, skladnik_id, ilosc)
 VALUES (3, 2, 0.14);
 INSERT INTO przepisy (rodzaj_kawy_id, skladnik_id, ilosc)
 VALUES (3, 5, 0.25);
+
+-- zamowienie kawy
+
+DELETE FROM zamowienia;
+
+INSERT INTO zamowienia (uzytkownik_id, koszt)
+VALUES (1, 111);
+
+INSERT INTO zamowiony_produkt (zamowienie_id, ilosc)
+VALUES (1, 2);
+
+INSERT INTO zamowiona_kawa (zamowiony_produkt_id, rodzaj_kawy_id)
+VALUES (1, 1);
+
+INSERT INTO zamowiony_produkt (zamowienie_id, ilosc)
+VALUES (1, 3);
+
+INSERT INTO zamowiony_wyrob_cukierniczy (zamowiony_produkt_id, wyrob_cukierniczy_id)
+VALUES (2, 4);
+
+INSERT INTO zamowiony_produkt (zamowienie_id, ilosc)
+VALUES (1, 1);
+
+INSERT INTO zamowiony_wyrob_cukierniczy (zamowiony_produkt_id, wyrob_cukierniczy_id)
+VALUES (3, 1);
