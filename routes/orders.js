@@ -389,4 +389,18 @@ router.put('/:id/pay', async (req, res) => {
   return res.status(200).send();
 });
 
+/**
+ * Przeznaczenie: Usuwa zamowienia o podanym id
+ * Metoda: DELETE
+ * URL: 'orders/:id'
+ * Parametr: [id] - id zamowienia
+ * */
+router.delete('/:id', async (req, res) => {
+  await db.query(sql`
+    DELETE FROM zamowienia
+    WHERE id=${req.params.id}
+  `);
+  return res.status(200).send();
+});
+
 module.exports = router;

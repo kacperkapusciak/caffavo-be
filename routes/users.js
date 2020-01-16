@@ -230,4 +230,18 @@ router.put('/:id', async (req, res) => {
   return res.status(200).send();
 });
 
+/**
+ * Przeznaczenie: Usuwa użytkownika o podanym id
+ * Metoda: DELETE
+ * URL: 'users/:id'
+ * Parametr: [id] - id użytkownika
+ * */
+router.delete('/:id', async (req, res) => {
+  await db.query(sql`
+    DELETE FROM uzytkownik
+    WHERE id=${req.params.id}
+  `);
+  return res.status(200).send();
+});
+
 module.exports = router;
