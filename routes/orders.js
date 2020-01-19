@@ -423,10 +423,12 @@ router.put('/:id/cancel', async (req, res) => {
   `);
 
   const { oplacone, koszt, koszt_dostawy } = zamowienie[0];
-  if (oplacone === 'true') {
+
+  if (oplacone) {
+    const title = `Zwrot anulowanego zamówienia: #${id}`;
     await db.query(sql`
       INSERT INTO transakcje (wartosc, tytul, zamowienie_id)
-      VALUES (${-(koszt + koszt_dostawy)}, "Zwrot kosztów zamówienia: ${id}", ${id})
+      VALUES (${-(parseFloat(koszt) + parseFloat(koszt_dostawy))}, ${title}, ${id})
     `);
   }
 
