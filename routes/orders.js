@@ -51,6 +51,7 @@ router.get('/', async (req, res) => {
     FROM zamowienia z
     JOIN uzytkownik u
     ON z.uzytkownik_id = u.id
+    ORDER BY data_zlozenia DESC
   `);
 
   const mappedRows = rows.map(row => ({
@@ -110,7 +111,8 @@ router.get('/user/:id', async (req, res) => {
   const { rows } = await db.query(sql`
     SELECT id, status, data_zlozenia, data_realizacji,
     koszt, koszt_dostawy, oplacone, opinie_id FROM zamowienia
-    WHERE uzytkownik_id=${req.params.id};
+    WHERE uzytkownik_id=${req.params.id}
+    ORDER BY data_zlozenia DESC
   `);
 
   const mappedRows = rows.map(row => ({
