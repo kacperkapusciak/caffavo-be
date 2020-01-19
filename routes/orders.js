@@ -387,7 +387,7 @@ router.put('/:id/pay', async (req, res) => {
 
   const { koszt, koszt_dostawy } = rows[0];
   const paymentValue = parseFloat(koszt) + parseFloat(koszt_dostawy);
-  const paymentTitle = `Oplata zamowienia: ${id}`;
+  const paymentTitle = `Oplata zamowienia: #${id}`;
 
   await db.query(sql`
     INSERT INTO transakcje (wartosc, tytul, zamowienie_id)
@@ -423,7 +423,7 @@ router.put('/:id/cancel', async (req, res) => {
   `);
 
   const { oplacone, koszt, koszt_dostawy } = zamowienie[0];
-  if (oplacone) {
+  if (oplacone === 'true') {
     await db.query(sql`
       INSERT INTO transakcje (wartosc, tytul, zamowienie_id)
       VALUES (${-(koszt + koszt_dostawy)}, "Zwrot kosztów zamówienia: ${id}", ${id})
