@@ -5,6 +5,7 @@ const offer = require('./offer');
 const orders = require('./orders');
 const finance = require('./finance');
 const bakery = require('./bakery');
+const coffee = require('./coffee');
 
 module.exports = app => {
   app.use('/users', users);
@@ -14,4 +15,5 @@ module.exports = app => {
   app.use('/orders', orders);
   app.use('/finance', finance);
   app.use('/bakery', bakery);
+  app.use('/coffee', coffee);
 };

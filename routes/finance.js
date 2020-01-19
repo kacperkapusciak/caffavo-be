@@ -36,7 +36,7 @@ const router = new Router();
  * */
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`
-    SELECT * FROM transakcje
+    SELECT * FROM transakcje ORDER BY wykonana_o DESC
   `);
 
   const mappedRows = rows.map(row => ({
