@@ -46,12 +46,17 @@ const router = new Router();
  * */
 router.get('/', async (req, res) => {
   const { rows } = await db.query(sql`
-    SELECT * FROM zamowienia;
+    SELECT z.id, uzytkownik_id, email, z.adres_id, status, data_zlozenia,
+    data_realizacji, koszt, koszt_dostawy, oplacone, opinie_id
+    FROM zamowienia z
+    JOIN uzytkownik u
+    ON z.uzytkownik_id = u.id
   `);
 
   const mappedRows = rows.map(row => ({
     id: row.id,
     userId: row.uzytkownik_id,
+    email: row.email,
     addressId: row.adres_id,
     status: row.status,
     createdAt: row.data_zlozenia,
