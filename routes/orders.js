@@ -162,7 +162,7 @@ router.get('/user/:id', async (req, res) => {
  *      { ... }
  *    ]
  *  }
- *  
+ *
  *  Przykładowa odpowiedź:
  *  {
  *    "id": 1,
@@ -386,6 +386,43 @@ router.put('/:id/pay', async (req, res) => {
     INSERT INTO transakcje (wartosc, tytul, zamowienie_id)
     VALUES (${paymentValue}, ${paymentTitle}, ${id})
   `);
+  return res.status(200).send();
+});
+
+/**
+ *  Przeznaczenie: Anulowanie zamówienia
+ *  Metoda: PUT
+ *  URL: 'orders/:id/cancel'
+ *  Parametr: [id] - id zamówienia, które ma zostać anulowane
+ * */
+router.put('/:id/cancel', async (req, res) => {
+  const { id } = req.params;
+
+  const { rows: time } = await db.query(sql`
+    SELECT data_zlozenia FROM zamowienia
+    WHERE id=${id}
+  `);
+
+  const currentDate = new Date().valueOf();
+  const isExpired = (currentDate - time[0].data_zlozenia) / (60 * 1000) > 5;
+
+  if (isExpired) return res.status(403).send('Nie można anulować zamówienia starszego niż 5 minut.');
+
+  const { rows: zamowienie } = await db.query(sql`
+    UPDATE zamowienia
+    SET status='anulowane'
+    WHERE id=${id}
+    RETURNING oplacone, koszt, koszt_dostawy
+  `);
+
+  const { oplacone, koszt, koszt_dostawy } = zamowienie[0];
+  if (oplacone) {
+    await db.query(sql`
+      INSERT INTO transakcje (wartosc, tytul, zamowienie_id)
+      VALUES (${-(koszt + koszt_dostawy)}, "Zwrot kosztów zamówienia: ${id}", ${id})
+    `);
+  }
+
   return res.status(200).send();
 });
 
