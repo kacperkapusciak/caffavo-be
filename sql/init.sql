@@ -56,11 +56,11 @@ CREATE TABLE "uzytkownik" (
   "id" SERIAL PRIMARY KEY,
   "email" varchar UNIQUE NOT NULL,
   "haslo" varchar NOT NULL,
-  "admin" boolean NOT NULL DEFAULT false,
+  "admin" boolean NOT NULL DEFAULT false, -- dla prostej autoryzacji użytkowników
   "zarejestrowany_o" timestamp DEFAULT (now()),
   "imie" varchar,
   "nazwisko" varchar,
-  "telefon" varchar,
+  "telefon" varchar, -- telefon jako varchar ze względu na plusy, myślniki np. '+48654765876'
   "adres_id" int,
   FOREIGN KEY ("adres_id") REFERENCES "adres"("id")
 );
@@ -93,24 +93,24 @@ CREATE TABLE "zamowienia" (
 CREATE TABLE "zamowiony_produkt" (
   "id" SERIAL PRIMARY KEY,
   "zamowienie_id" int NOT NULL,
-  "ilosc" numeric(5,2) NOT NULL DEFAULT 1,
+  "ilosc" numeric(5,2) NOT NULL DEFAULT 1, -- ile produktów/kaw danego rodzaju zamówił klient
   FOREIGN KEY ("zamowienie_id") REFERENCES "zamowienia" ("id")
 );
 
 CREATE TABLE "rodzaje_kawy" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar UNIQUE NOT NULL,
-  "cena_skladnikow" numeric(5,2) DEFAULT 0,
-  "marza" numeric(5,2) DEFAULT 0,
+  "cena_skladnikow" numeric(5,2) DEFAULT 0, -- koszt zaparzenia kawy wynikający z ceny składników, liczony przy pomocy triggera
+  "marza" numeric(5,2) DEFAULT 0, -- ustawiana ręcznie przy dodawaniu rodzaju kawy
   "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
 CREATE TABLE "skladniki" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar NOT NULL,
-  "ilosc" numeric(6,2) NOT NULL DEFAULT 0,
+  "ilosc" numeric(6,2) NOT NULL DEFAULT 0, -- ile kilogramów/litrów/sztuk znajduje się w magazynie
   "jednostka" jednostka_skladnik NOT NULL,
-  "cena" numeric(5,2) NOT NULL DEFAULT 0,
+  "cena" numeric(5,2) NOT NULL DEFAULT 0, -- cena kupna składnika hurtowo
   "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
@@ -125,20 +125,20 @@ CREATE TABLE "przepisy" (
 CREATE TABLE "wyroby_cukiernicze" (
   "id" SERIAL PRIMARY KEY,
   "nazwa" varchar NOT NULL,
-  "porcja" numeric(5,2) NOT NULL,
+  "porcja" numeric(5,2) NOT NULL, -- sugerowana porcja serwowana klientowi np. 1 sztula ciastka lub 0.15 kg ciasta
   "ilosc" numeric(6,2) NOT NULL,
   "jednostka" jednostka_wyrob_cukierniczy NOT NULL DEFAULT 'sztuka',
-  "cena" numeric(5,2) NOT NULL DEFAULT 0,
-  "marza" numeric(5,2) DEFAULT 0,
+  "cena" numeric(5,2) NOT NULL DEFAULT 0, -- cena netto
+  "marza" numeric(5,2) DEFAULT 0, -- marża ustawiana ręcznie, razem z ceną netto tworzy cenę wyrobu cukierniczego
   "status" status_produktu NOT NULL DEFAULT 'niedostepny'
 );
 
 CREATE TABLE "transakcje" (
   "id" SERIAL PRIMARY KEY,
   "wykonana_o" timestamp DEFAULT (now()),
-  "wartosc" numeric(9,2) NOT NULL,
+  "wartosc" numeric(9,2) NOT NULL, -- dodatnia lub ujemna w zależności czy jest to wpływ czy wydatek
   "tytul" varchar(100) NOT NULL,
-  "zamowienie_id" int,
+  "zamowienie_id" int, -- nie wszystkie transakcje powiązane są z zamówieniami np. kupno składników
   FOREIGN KEY ("zamowienie_id") REFERENCES "zamowienia" ("id")
 );
 
@@ -179,7 +179,7 @@ AS SELECT
   nazwa,
   ROUND((cena + marza) * porcja, 2) as cena
 FROM wyroby_cukiernicze
-WHERE status != 'niedostepny';
+WHERE status != 'niedostepny'; -- jedynie dostępne wyroby ukazywane są klientowi
 
 CREATE VIEW "oferta_kaw"
 AS SELECT
@@ -187,7 +187,7 @@ AS SELECT
   nazwa,
   cena_skladnikow + marza as cena
 FROM rodzaje_kawy
-WHERE status != 'niedostepny';
+WHERE status != 'niedostepny'; -- podobnie z kawami, klient widzi tylko te na które wystarczy składników
 
 CREATE VIEW "zamowione_produkty"
 AS SELECT
